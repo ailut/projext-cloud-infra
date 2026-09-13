@@ -1,0 +1,21 @@
+# Terraform downloads provider files here after terraform init
+.terraform/
+
+# Local Terraform state - never push this to GitHub
+*.tfstate
+*.tfstate.*
+
+# Terraform crash logs generated when something fails unexpectedly
+crash.log
+crash.*.log
+
+# Variable files can contain environment-specific or sensitive values
+*.tfvars
+*.tfvars.json
+
+# Local Terraform CLI settings
+.terraformrc
+terraform.rc
+
+# macOS creates this file automatically in folders
+.DS_Store
