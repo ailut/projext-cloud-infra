@@ -2,17 +2,17 @@
 #point s3 to 'FLOCI' aws
 
 provider "aws" {
-    region = "us-east-1"
-    access_key = "test"
-    secret_key = "test"
+  region     = "us-east-1"
+  access_key = "test"
+  secret_key = "test"
 
-    skip_credentials_validation = true
-    skip_metadata_api_check = true
-    skip_requesting_account_id = true
+  skip_credentials_validation = true
+  skip_metadata_api_check     = true
+  skip_requesting_account_id  = true
 
-    endpoints {
-      s3 = "http://localhost:4566"
-    }
+  endpoints {
+    s3 = "http://localhost:4566"
+  }
 }
 
 # IN AN ACTUAL AWS DEPLOYMENT(INSTEAD HANDLED BY CLI):
