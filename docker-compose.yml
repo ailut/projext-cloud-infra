@@ -1,0 +1,8 @@
+#Running a FLOCI image
+#making FLOCI available on same port for terraform provider.
+
+services:
+  floci:
+    image: floci/floci:latest
+    ports:
+      - "4566:4566"
