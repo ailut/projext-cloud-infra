@@ -3,8 +3,8 @@ resource "aws_s3_bucket" "application_data" {
   bucket = "projext-dev-application-data"
 
   tags = {
-    Project     = "projext"
-    Environment = "dev"
+    Project     = var.project
+    Environment = var.environment
     ManagedBy   = "terraform"
   }
 }
