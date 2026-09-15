@@ -6,20 +6,7 @@ The current setup uses the AWS provider with a local Floci runtime so infrastruc
 
 ## Current Architecture
 
-```text
-VS Code / Mac
-    |
-    | Terraform
-    v
-AWS Provider
-    |
-    | S3 endpoint: http://localhost:4566
-    v
-Shared Floci runtime
-    |
-    +--> Floci API
-    +--> Floci UI
-```
+![Local Development Architecture](docs/images/local-development-architecture.svg)
 
 The Floci runtime is started separately from this repository. This repository does not start or own the Floci Docker stack.
 
@@ -59,6 +46,9 @@ The `Project` and `Environment` values are supplied through Terraform variables.
 projext-cloud-infra/
 ├── .gitignore
 ├── .terraform.lock.hcl
+├── docs/
+│   └── images/
+│       └── local-development-architecture.svg
 ├── main.tf
 ├── provider.tf
 ├── variables.tf
