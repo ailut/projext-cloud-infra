@@ -1,6 +1,10 @@
 #using aws provider
 #point s3 to 'FLOCI' aws
 
+# EDIT: projext-cloud-infra :-
+# 1.does NOT start Floci anymore
+# 2.only connects to it
+
 provider "aws" {
   region     = "us-east-1"
   access_key = "test"
