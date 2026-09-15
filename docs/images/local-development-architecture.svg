@@ -22,9 +22,16 @@
   <text x="800" y="62" text-anchor="middle" class="title">projext-cloud-infra - Local Development Architecture</text>
 
   <rect x="55" y="115" rx="18" ry="18" width="300" height="165" class="box"/>
-  <circle cx="130" cy="165" r="24" fill="#315d8a"/>
-  <path d="M95 228c7-34 63-34 70 0v12H95z" fill="#315d8a"/>
-  <path d="M215 154l35-28 32 13v52l-32 13-35-28 22-11z" fill="#1689d8" opacity=".95"/>
+  <circle cx="125" cy="165" r="24" fill="#315d8a"/>
+  <path d="M90 228c7-34 63-34 70 0v12H90z" fill="#315d8a"/>
+  <!-- Recognizable VS Code-style folded ribbon mark -->
+  <g transform="translate(205 135)">
+    <path d="M0 27 19 11 45 31 77 3 96 11 96 73 77 81 45 53 19 73 0 57 31 42Z" fill="#23A9F2"/>
+    <path d="M45 31 77 3 96 11 96 73 77 81 45 53 62 42Z" fill="#168AD4"/>
+    <path d="M19 11 45 31 31 42 0 27Z" fill="#1177BB"/>
+    <path d="M19 73 45 53 31 42 0 57Z" fill="#1177BB"/>
+    <path d="M62 42 77 29 77 55Z" fill="#EAF6FF" opacity=".95"/>
+  </g>
   <text x="205" y="255" text-anchor="middle" class="t">Developer / VS Code</text>
 
   <rect x="430" y="115" rx="18" ry="18" width="300" height="165" class="box"/>
