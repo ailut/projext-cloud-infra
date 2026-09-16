@@ -1,6 +1,6 @@
 # Here we create an S3 bucket resource in  FLOCI env
 resource "aws_s3_bucket" "application_data" {
-  bucket = "${var.project}-${var.environment}-application-data"
+  bucket = "${local.name_prefix}-application-data"
 
   tags = {
     Project     = var.project
