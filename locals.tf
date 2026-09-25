@@ -2,12 +2,14 @@
 
 
 locals {
-  name_prefix = "${var.project}-${var.environment}"
+  environment = terraform.workspace
+  name_prefix = "${var.project}-${local.environment}"
 
 
   common_tags = {
     Project     = var.project
-    Environment = var.environment
+    Environment = local.environment
     ManagedBy   = "terraform"
   }
+
 }
