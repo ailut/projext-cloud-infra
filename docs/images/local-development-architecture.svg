@@ -1,85 +1,107 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-  <title id="title">projext-cloud-infra - Local Development Architecture</title>
-  <desc id="desc">Terraform local development architecture showing VS Code, Terraform CLI, AWS Provider, shared Floci runtime, AWS CLI verification, and the projext S3 bucket.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980" role="img" aria-labelledby="title desc">
+  <title id="title">projext-cloud-infra architecture</title>
+  <desc id="desc">Terraform local development architecture with bootstrap state bucket, remote workspace state, dev and qa application buckets, and a separate Floci runtime.</desc>
   <defs>
     <style>
       .title{font:700 42px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;fill:#10243e}
-      .h{font:700 25px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;fill:#10243e}
-      .t{font:600 21px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;fill:#17304f}
-      .s{font:500 17px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;fill:#48627d}
-      .note{font:500 18px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;fill:#29445f}
+      .h{font:700 24px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;fill:#10243e}
+      .t{font:600 20px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;fill:#17304f}
+      .s{font:500 16px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;fill:#48627d}
+      .note{font:500 17px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;fill:#29445f}
       .box{fill:#f7fbff;stroke:#3d6f9f;stroke-width:2}
-      .inner{fill:#ffffff;stroke:#3488cf;stroke-width:2}
+      .root{fill:#f8f7ff;stroke:#7354d8;stroke-width:3}
       .runtime{fill:#eef8ff;stroke:#1f82c9;stroke-width:3}
+      .state{fill:#fff8ec;stroke:#e59a21;stroke-width:3}
       .arrow{stroke:#2c7fc3;stroke-width:5;fill:none;marker-end:url(#a)}
-      .arrow2{stroke:#2c7fc3;stroke-width:5;fill:none;marker-start:url(#a2);marker-end:url(#a)}
+      .arrowP{stroke:#7354d8;stroke-width:5;fill:none;marker-end:url(#p)}
+      .arrowO{stroke:#e59a21;stroke-width:5;fill:none;marker-end:url(#o)}
+      .dash{stroke-dasharray:10 8}
     </style>
     <marker id="a" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#2c7fc3"/></marker>
-    <marker id="a2" markerWidth="12" markerHeight="12" refX="2" refY="6" orient="auto"><path d="M12,0 L0,6 L12,12 z" fill="#2c7fc3"/></marker>
+    <marker id="p" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#7354d8"/></marker>
+    <marker id="o" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#e59a21"/></marker>
   </defs>
 
-  <rect width="1600" height="900" fill="#ffffff"/>
-  <text x="800" y="62" text-anchor="middle" class="title">projext-cloud-infra - Local Development Architecture</text>
+  <rect width="1600" height="980" fill="#ffffff"/>
+  <text x="800" y="58" text-anchor="middle" class="title">projext-cloud-infra — Terraform + Floci Architecture</text>
 
-  <rect x="55" y="115" rx="18" ry="18" width="300" height="165" class="box"/>
-  <circle cx="125" cy="165" r="24" fill="#315d8a"/>
-  <path d="M90 228c7-34 63-34 70 0v12H90z" fill="#315d8a"/>
-  <!-- Recognizable VS Code-style folded ribbon mark -->
-  <g transform="translate(205 135)">
+  <rect x="55" y="105" rx="18" ry="18" width="260" height="145" class="box"/>
+  <circle cx="115" cy="153" r="23" fill="#315d8a"/>
+  <path d="M82 212c7-32 60-32 67 0v10H82z" fill="#315d8a"/>
+  <g transform="translate(185 127)">
     <path d="M0 27 19 11 45 31 77 3 96 11 96 73 77 81 45 53 19 73 0 57 31 42Z" fill="#23A9F2"/>
     <path d="M45 31 77 3 96 11 96 73 77 81 45 53 62 42Z" fill="#168AD4"/>
-    <path d="M19 11 45 31 31 42 0 27Z" fill="#1177BB"/>
-    <path d="M19 73 45 53 31 42 0 57Z" fill="#1177BB"/>
-    <path d="M62 42 77 29 77 55Z" fill="#EAF6FF" opacity=".95"/>
   </g>
-  <text x="205" y="255" text-anchor="middle" class="t">Developer / VS Code</text>
+  <text x="185" y="226" text-anchor="middle" class="t">Developer / VS Code</text>
 
-  <rect x="430" y="115" rx="18" ry="18" width="300" height="165" class="box"/>
-  <g transform="translate(522 140)" fill="#7354d8"><path d="M0 0l38 20v42L0 42z"/><path d="M43 22l38-22v42L43 63z"/><path d="M43 69l38-22v42l-38 21z"/></g>
-  <text x="580" y="255" text-anchor="middle" class="t">Terraform CLI</text>
+  <rect x="375" y="105" rx="18" ry="18" width="285" height="145" class="root"/>
+  <text x="517" y="146" text-anchor="middle" class="h">Root Terraform</text>
+  <text x="517" y="178" text-anchor="middle" class="s">workspaces: dev / qa</text>
+  <text x="517" y="205" text-anchor="middle" class="s">main.tf · locals.tf · outputs.tf</text>
+  <text x="517" y="230" text-anchor="middle" class="s">backend.tf</text>
 
-  <rect x="805" y="115" rx="18" ry="18" width="300" height="165" class="box"/>
-  <text x="955" y="185" text-anchor="middle" style="font:700 66px Arial,sans-serif;fill:#243b53">aws</text>
-  <path d="M900 201c38 29 90 31 133 5" stroke="#f59e0b" stroke-width="7" fill="none" stroke-linecap="round"/>
-  <text x="955" y="255" text-anchor="middle" class="t">AWS Provider</text>
+  <rect x="720" y="105" rx="18" ry="18" width="285" height="145" class="box"/>
+  <text x="862" y="146" text-anchor="middle" class="h">AWS Provider</text>
+  <text x="862" y="178" text-anchor="middle" class="s">S3 requests</text>
+  <text x="862" y="205" text-anchor="middle" class="s">local endpoint override</text>
+  <text x="862" y="230" text-anchor="middle" class="s">localhost:4566</text>
 
-  <path d="M355 198H425" class="arrow"/>
-  <path d="M730 198H800" class="arrow"/>
-  <path d="M955 280V328" class="arrow"/>
+  <rect x="1065" y="105" rx="18" ry="18" width="300" height="145" class="runtime"/>
+  <text x="1215" y="146" text-anchor="middle" class="h">Shared Floci Runtime</text>
+  <text x="1215" y="178" text-anchor="middle" class="s">Backend :4566</text>
+  <text x="1215" y="205" text-anchor="middle" class="s">API :4501</text>
+  <text x="1215" y="230" text-anchor="middle" class="s">UI :4500</text>
 
-  <rect x="490" y="335" rx="22" ry="22" width="820" height="315" class="runtime"/>
-  <rect x="705" y="352" width="44" height="44" rx="8" fill="#2d92da"/><path d="M711 366l16-9 16 9-16 9zM711 369v15l14 8v-15zM743 369v15l-14 8v-15z" fill="#eaf6ff"/>
-  <text x="775" y="385" class="h">Shared Floci Runtime</text>
+  <path d="M315 177H370" class="arrow"/>
+  <path d="M660 177H715" class="arrow"/>
+  <path d="M1005 177H1060" class="arrow"/>
 
-  <rect x="525" y="435" rx="16" ry="16" width="235" height="165" class="inner"/>
-  <g transform="translate(612 462)" fill="#355f8a"><rect x="0" y="0" width="62" height="18" rx="6"/><rect x="0" y="25" width="62" height="18" rx="6"/><rect x="0" y="50" width="62" height="18" rx="6"/><circle cx="12" cy="9" r="2.8" fill="#fff"/><circle cx="12" cy="34" r="2.8" fill="#fff"/><circle cx="12" cy="59" r="2.8" fill="#fff"/></g>
-  <text x="642" y="555" text-anchor="middle" class="t">Floci Backend</text>
-  <text x="642" y="583" text-anchor="middle" class="s">localhost:4566</text>
+  <rect x="85" y="340" rx="18" ry="18" width="360" height="190" class="box"/>
+  <text x="265" y="385" text-anchor="middle" class="h">Bootstrap Terraform</text>
+  <text x="265" y="420" text-anchor="middle" class="s">separate Terraform configuration</text>
+  <text x="265" y="450" text-anchor="middle" class="s">creates the shared state bucket</text>
+  <text x="265" y="487" text-anchor="middle" class="t">projext-terraform-state</text>
 
-  <rect x="785" y="435" rx="16" ry="16" width="235" height="165" class="inner"/>
-  <g transform="translate(875 465)" fill="#355f8a"><circle cx="28" cy="28" r="15" fill="#fff"/><path d="M28 0l7 8 10-2 3 10 10 3-2 10 8 7-8 7 2 10-10 3-3 10-10-2-7 8-7-8-10 2-3-10-10-3 2-10-8-7 8-7-2-10 10-3 3-10 10 2z" fill="#355f8a"/><circle cx="28" cy="28" r="11" fill="#fff"/></g>
-  <text x="902" y="555" text-anchor="middle" class="t">Floci API</text>
-  <text x="902" y="583" text-anchor="middle" class="s">localhost:4501</text>
+  <rect x="570" y="325" rx="20" ry="20" width="470" height="225" class="state"/>
+  <text x="805" y="368" text-anchor="middle" class="h">Remote State Bucket</text>
+  <text x="805" y="400" text-anchor="middle" class="t">projext-terraform-state</text>
+  <line x1="610" y1="425" x2="1000" y2="425" stroke="#e2bf79" stroke-width="2"/>
+  <text x="625" y="462" class="s">env/dev/terraform.tfstate</text>
+  <text x="625" y="495" class="s">env/qa/terraform.tfstate</text>
+  <text x="625" y="528" class="s">terraform.tfstate (default workspace)</text>
 
-  <rect x="1045" y="435" rx="16" ry="16" width="235" height="165" class="inner"/>
-  <rect x="1120" y="462" width="84" height="55" rx="5" fill="none" stroke="#355f8a" stroke-width="6"/><line x1="1162" y1="517" x2="1162" y2="534" stroke="#355f8a" stroke-width="6"/><line x1="1140" y1="536" x2="1184" y2="536" stroke="#355f8a" stroke-width="6"/>
-  <text x="1162" y="555" text-anchor="middle" class="t">Floci UI</text>
-  <text x="1162" y="583" text-anchor="middle" class="s">localhost:4500</text>
+  <path d="M445 435H565" class="arrowO"/>
+  <path d="M517 250V318H805" class="arrowO dash"/>
 
-  <rect x="135" y="440" rx="18" ry="18" width="250" height="160" class="box"/>
-  <rect x="200" y="472" width="88" height="58" rx="8" fill="#27496d"/>
-  <text x="244" y="511" text-anchor="middle" style="font:700 28px monospace;fill:#fff">&gt;_</text>
-  <text x="260" y="565" text-anchor="middle" class="t">AWS CLI</text>
-  <text x="260" y="630" text-anchor="middle" class="s">CLI verification against</text>
-  <text x="260" y="653" text-anchor="middle" class="s">the same endpoint</text>
-  <path d="M390 520H520" class="arrow2"/>
+  <rect x="1130" y="335" rx="18" ry="18" width="370" height="205" class="box"/>
+  <text x="1315" y="380" text-anchor="middle" class="h">Application Infrastructure</text>
+  <text x="1315" y="423" text-anchor="middle" class="t">dev workspace</text>
+  <text x="1315" y="452" text-anchor="middle" class="s">projext-dev-application-data</text>
+  <text x="1315" y="492" text-anchor="middle" class="t">qa workspace</text>
+  <text x="1315" y="521" text-anchor="middle" class="s">projext-qa-application-data</text>
 
-  <path d="M642 600V690" class="arrow"/>
-  <rect x="490" y="700" rx="18" ry="18" width="420" height="125" class="box"/>
-  <path d="M545 735c0-13 22-24 48-24s48 11 48 24v42c0 13-22 24-48 24s-48-11-48-24z" fill="#278bd4"/><ellipse cx="593" cy="735" rx="48" ry="24" fill="#4aa3e1"/>
-  <text x="670" y="752" class="h">S3 Bucket</text>
-  <text x="670" y="785" class="s">projext-dev-application-data</text>
+  <path d="M1215 250V325" class="arrow"/>
+  <path d="M1040 438H1125" class="arrow"/>
 
-  <rect x="35" y="845" width="1530" height="38" rx="12" fill="#f4f8fc" stroke="#b7cadc"/>
-  <text x="800" y="871" text-anchor="middle" class="note">Terraform defines the infrastructure, Floci provides the local AWS-compatible runtime, and Floci UI provides visual verification.</text>
+  <rect x="125" y="655" rx="18" ry="18" width="300" height="150" class="box"/>
+  <text x="275" y="700" text-anchor="middle" class="h">AWS CLI</text>
+  <text x="275" y="735" text-anchor="middle" class="s">verifies Floci resources</text>
+  <text x="275" y="765" text-anchor="middle" class="s">and backend state objects</text>
+
+  <rect x="510" y="635" rx="18" ry="18" width="580" height="190" class="root"/>
+  <text x="800" y="680" text-anchor="middle" class="h">Typical Terraform Flow</text>
+  <text x="800" y="720" text-anchor="middle" class="t">workspace show → plan → apply</text>
+  <text x="800" y="752" text-anchor="middle" class="s">dev uses dev state · qa uses qa state</text>
+  <text x="800" y="784" text-anchor="middle" class="s">state is read from and written back to S3 backend</text>
+
+  <rect x="1175" y="655" rx="18" ry="18" width="300" height="150" class="runtime"/>
+  <text x="1325" y="700" text-anchor="middle" class="h">Floci UI</text>
+  <text x="1325" y="735" text-anchor="middle" class="s">visual inspection</text>
+  <text x="1325" y="765" text-anchor="middle" class="s">localhost:4500</text>
+
+  <path d="M425 730H505" class="arrow"/>
+  <path d="M1090 730H1170" class="arrow"/>
+
+  <rect x="35" y="890" width="1530" height="55" rx="12" fill="#f4f8fc" stroke="#b7cadc"/>
+  <text x="800" y="923" text-anchor="middle" class="note">Bootstrap creates the shared state bucket; root Terraform uses remote workspace state while Floci provides the local AWS-compatible runtime.</text>
 </svg>
