@@ -2,7 +2,7 @@
 
 Terraform-based infrastructure project for the fictional `projext` environment.
 
-The current setup uses the AWS provider with a local Floci runtime so infrastructure can be developed and tested without creating real AWS resources. The Terraform code is intentionally written to stay close to what would be used in an actual AWS environment.
+The project uses the AWS provider with a local Floci runtime so infrastructure can be developed and tested without creating real AWS resources. The Terraform code is intentionally kept close to what would be used against real AWS.
 
 ## Current Architecture
 
@@ -10,156 +10,278 @@ The current setup uses the AWS provider with a local Floci runtime so infrastruc
 
 The Floci runtime is started separately from this repository. This repository does not start or own the Floci Docker stack.
 
-For local development:
+Local endpoints:
 
 - Floci UI: `http://localhost:4500`
 - Floci API: `http://localhost:4501`
 - Floci AWS-compatible backend: `http://localhost:4566`
 
-## What Has Been Built So Far
+## What Is Managed Today
 
-The project currently manages one S3 bucket:
+The root Terraform configuration uses workspaces for environment separation.
+
+Current environments:
+
+```text
+dev
+qa
+```
+
+Application buckets:
 
 ```text
 projext-dev-application-data
+projext-qa-application-data
 ```
 
-Terraform local resource address:
+Terraform resource address in each workspace:
 
 ```text
 aws_s3_bucket.application_data
 ```
 
-The bucket currently includes these tags:
+The bucket name is built from the active workspace:
+
+```text
+projext + workspace + application-data
+```
+
+Common tags:
 
 ```text
 Project     = projext
-Environment = dev
+Environment = <active workspace>
 ManagedBy   = terraform
 ```
 
-The `Project` and `Environment` values are supplied through Terraform variables.
+## Remote State
+
+Terraform state for the root configuration is stored remotely in a dedicated S3-compatible bucket:
+
+```text
+projext-terraform-state
+```
+
+The backend uses workspace-specific state paths:
+
+```text
+env/dev/terraform.tfstate
+env/qa/terraform.tfstate
+```
+
+The default workspace also has its own base state object:
+
+```text
+terraform.tfstate
+```
+
+For local development, this backend is hosted by Floci at `http://localhost:4566`.
+
+## Bootstrap Configuration
+
+The remote-state bucket must exist before the root configuration can use it as a backend.
+
+The `bootstrap/` directory is a separate Terraform configuration whose job is to create:
+
+```text
+projext-terraform-state
+```
+
+Bootstrap state remains separate from the root configuration.
+
+Conceptually:
+
+```text
+bootstrap Terraform
+        ↓
+creates projext-terraform-state
+        ↓
+root Terraform backend
+        ↓
+stores dev / qa workspace state
+```
 
 ## Repository Structure
 
 ```text
 projext-cloud-infra/
-├── .gitignore
-├── .terraform.lock.hcl
+├── bootstrap/
+│   ├── .terraform.lock.hcl
+│   ├── main.tf
+│   ├── outputs.tf
+│   ├── provider.tf
+│   └── versions.tf
 ├── docs/
 │   └── images/
 │       └── local-development-architecture.svg
+├── .gitignore
+├── .terraform.lock.hcl
+├── backend.tf
+├── locals.tf
 ├── main.tf
+├── outputs.tf
 ├── provider.tf
 ├── variables.tf
 └── versions.tf
 ```
 
+Local environment value files such as `dev.tfvars` and `qa.tfvars` are intentionally ignored by Git.
+
+## Root Terraform Files
+
 ### `versions.tf`
 
-Defines the Terraform and provider requirements for the project.
+Defines the Terraform and AWS provider requirements.
 
-Current requirements:
+Current constraints:
 
 - Terraform `>= 1.16.0`
 - HashiCorp AWS provider `~> 6.0`
 
 ### `provider.tf`
 
-Configures the AWS provider for local development.
+Configures the AWS provider for local Floci development.
 
-For the current Floci environment it:
+It:
 
 - uses region `us-east-1`
 - uses local test credentials
-- skips AWS-specific validation calls that are not required by the emulator
+- skips AWS validation calls that are not required by the emulator
 - redirects S3 requests to `http://localhost:4566`
 
-In a real AWS environment, the Floci endpoint override and emulator-specific skip settings would normally be removed. Authentication would instead come from a supported AWS mechanism such as AWS CLI credentials, AWS SSO, environment variables, IAM roles, or CI/CD identity.
+In a real AWS deployment, credentials would normally come from AWS CLI/SSO, environment variables, IAM roles, or CI/CD OIDC. The Floci endpoint override and emulator-specific skip settings would normally be removed.
 
-### `main.tf`
+### `backend.tf`
 
-Defines the infrastructure managed by Terraform.
+Configures the root Terraform state backend.
 
-The current resource is an S3 bucket named:
+It stores state in:
 
 ```text
-projext-dev-application-data
+projext-terraform-state
 ```
 
-The Terraform resource type is `aws_s3_bucket`, while `application_data` is the local Terraform name used to reference the resource within the configuration.
+and uses:
+
+```text
+workspace_key_prefix = "env"
+```
+
+so non-default workspaces are stored separately.
 
 ### `variables.tf`
 
-Defines reusable input values for the Terraform configuration.
+Declares required Terraform inputs.
 
-Current variables:
-
-- `project` with default value `projext`
-- `environment` with default value `dev`
-
-These values are currently used for resource tagging.
-
-### `.terraform.lock.hcl`
-
-Tracks the exact provider dependency selections made by Terraform during initialization.
-
-This file is committed so developers and CI/CD environments can use consistent provider versions.
-
-### `.gitignore`
-
-Keeps local Terraform-generated files and state out of Git, including:
-
-- `.terraform/`
-- `*.tfstate`
-- `*.tfstate.*`
-- local variable files
-- Terraform crash logs
-
-Terraform state is intentionally not stored in Git.
-
-## Terraform Workflow Used So Far
+Current variable:
 
 ```text
-terraform init
-    -> initialize the working directory and install providers
-
-terraform fmt
-    -> format Terraform configuration files
-
-terraform validate
-    -> check configuration syntax and structure
-
-terraform plan
-    -> preview infrastructure changes
-
-terraform apply
-    -> create or update infrastructure
+project
 ```
 
-The project has already demonstrated both:
+The environment is no longer supplied as a variable. It is derived from the active Terraform workspace.
 
-- creating a new resource
-- modifying an existing resource in place by adding tags
+### `locals.tf`
 
-## Terraform State
+Defines reusable calculated values.
 
-Terraform maintains a local `terraform.tfstate` file that records the infrastructure it currently manages.
+Current pattern:
 
-Useful commands used in this project:
+```text
+terraform.workspace
+        ↓
+local.environment
+        ↓
+local.name_prefix
+        ↓
+projext-dev / projext-qa
+```
+
+It also defines reusable common tags.
+
+### `main.tf`
+
+Defines the application-data S3 bucket:
+
+```text
+${local.name_prefix}-application-data
+```
+
+Examples:
+
+```text
+dev → projext-dev-application-data
+qa  → projext-qa-application-data
+```
+
+### `outputs.tf`
+
+Exposes:
+
+- application data bucket name
+- application data bucket ARN
+
+Because outputs are stored per workspace, the same output name returns the value for the active workspace.
+
+## Workspace Workflow
+
+Check the active workspace before planning or applying:
 
 ```bash
-terraform state list
-terraform state show aws_s3_bucket.application_data
+terraform workspace show
 ```
 
-The state file is local and ignored by Git.
+Development:
 
-## Local Verification with AWS CLI
+```bash
+terraform workspace select dev
+terraform plan -var-file=dev.tfvars
+terraform apply -var-file=dev.tfvars
+```
 
-The AWS CLI can be pointed directly at the Floci backend.
+QA:
 
-For a local shell session:
+```bash
+terraform workspace select qa
+terraform plan -var-file=qa.tfvars
+terraform apply -var-file=qa.tfvars
+```
+
+The workspace controls which state Terraform uses. The `.tfvars` file supplies environment-specific input values that are still needed by the configuration.
+
+## Terraform Workflow
+
+Typical local workflow:
+
+```text
+terraform fmt
+        ↓
+terraform validate
+        ↓
+terraform workspace show
+        ↓
+terraform plan -var-file=<environment>.tfvars
+        ↓
+review
+        ↓
+terraform apply -var-file=<environment>.tfvars
+```
+
+When a working directory is new, or providers/modules/backend configuration change:
+
+```bash
+terraform init
+```
+
+The root configuration was migrated from local state to the S3 backend with:
+
+```bash
+terraform init -migrate-state
+```
+
+## Verifying Remote State
+
+With the local Floci credentials exported:
 
 ```bash
 export AWS_ACCESS_KEY_ID=test
@@ -167,85 +289,62 @@ export AWS_SECRET_ACCESS_KEY=test
 export AWS_DEFAULT_REGION=us-east-1
 ```
 
-Then verify local S3 resources with:
+List the backend objects:
 
 ```bash
-aws s3 ls --endpoint-url http://localhost:4566
+aws s3 ls s3://projext-terraform-state --recursive --endpoint-url http://localhost:4566
 ```
 
-The Terraform-managed bucket should appear in the results.
-
-## Floci UI
-
-The Floci UI stack runs separately from this repository and provides a visual view of locally emulated AWS resources.
-
-The active local stack contains:
+Expected workspace state objects include:
 
 ```text
-Floci UI      -> localhost:4500
-Floci API     -> localhost:4501
-Floci backend -> localhost:4566
+env/dev/terraform.tfstate
+env/qa/terraform.tfstate
 ```
-
-Terraform and the AWS CLI running on the Mac connect to:
-
-```text
-http://localhost:4566
-```
-
-Containers inside the Floci Docker network can reach the same backend using:
-
-```text
-http://floci:4566
-```
-
-The distinction is important: `localhost:4566` is the host-facing endpoint, while `floci:4566` is the Docker-internal service address.
-
-## Local Runtime and Persistence
-
-The original standalone Floci Compose configuration was removed from this repository. The shared Floci UI stack is now the local AWS-compatible runtime used by this project.
-
-The current Floci UI stack uses persistent storage, so its resource data can survive normal container recreation when its mounted data directory is retained.
 
 ## Floci vs Real AWS
 
-The goal is to keep the infrastructure definitions close to real AWS Terraform.
-
-For example, the S3 resource in `main.tf` can remain essentially the same in both environments.
-
-The main difference is the provider layer:
+Local development:
 
 ```text
-Local development
-Terraform -> AWS provider -> localhost:4566 -> Floci
-
-Real AWS
-Terraform -> AWS provider -> AWS APIs
+Terraform
+→ AWS provider / S3 backend
+→ localhost:4566
+→ Floci
 ```
 
-This separation allows the project to move toward a real AWS account later without redesigning the resource model from scratch.
+Real AWS:
 
-## Current Learning Milestones
+```text
+Terraform
+→ AWS provider / S3 backend
+→ AWS APIs
+```
 
-So far this project has covered:
+The resource definitions remain largely the same. The main differences are authentication and endpoint configuration.
 
-- Terraform CLI installation and verification
-- Terraform project initialization
-- provider version management
-- Terraform dependency locking
-- AWS provider configuration
+## Current Milestones
+
+The project now covers:
+
+- Terraform initialization, formatting, validation, planning, and apply
+- AWS provider dependency locking
 - local AWS emulation with Floci
-- Docker-based Floci runtime
+- persistent Floci runtime
 - S3 resource creation
-- Terraform planning and apply workflow
-- Terraform state inspection
-- drift detection after changing the local Floci runtime
-- AWS CLI verification against a local endpoint
-- Floci UI verification
-- Terraform resource tagging
-- Terraform input variables
-- Git and GitHub workflow for Terraform changes
+- input variables
+- locals and reusable common tags
+- Terraform outputs
+- Terraform workspaces
+- separate dev and QA infrastructure
+- workspace-based environment naming
+- bootstrap Terraform configuration
+- dedicated Terraform state bucket
+- S3 remote backend
+- migration from local state to remote state
+- remote workspace state verification
+- Git/GitHub workflow for infrastructure changes
 
-## Next Steps
+## Next Step
 
-The next Terraform topic will continue building on the current configuration while keeping the local Floci environment separate from this repository.
+The next phase is CI/CD with GitHub Actions: initialize Terraform on a fresh runner, connect to the remote backend, select the correct workspace, validate, plan, and eventually apply with appropriate approval controls.
