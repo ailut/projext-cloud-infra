@@ -1,20 +1,21 @@
-name: Runner Test
+name: Floci Runner Smoke Test
 
 on:
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   test-runner:
     runs-on: [self-hosted, macOS, ARM64]
 
     steps:
-      - name: Show runner information
+      - name: Verify runner architecture
         run: |
-          echo "Runner is working"
+          echo "Self-hosted runner is available"
           uname -m
-          whoami
-          pwd
-    
+
       - name: Check Floci connectivity
         run: |
-          curl http://localhost:4566/_floci/health
+          curl --fail --silent --show-error http://localhost:4566/_floci/health
