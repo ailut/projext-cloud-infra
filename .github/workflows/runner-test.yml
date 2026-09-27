@@ -1,0 +1,16 @@
+name: Runner Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-runner:
+    runs-on: [self-hosted, macOS, ARM64]
+
+    steps:
+      - name: Show runner information
+        run: |
+          echo "Runner is working"
+          uname -m
+          whoami
+          pwd
