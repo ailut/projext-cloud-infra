@@ -44,8 +44,7 @@ jobs:
         # makes terraform available on the temporary ubuntu machine.
       - name: Verify Floci Connectivity
         run: curl --fail --silent --show-error http://localhost:4566/_floci/health
-        
-        
+          
         # initialize terraform without backend whihout interative questions. 
         # Backend here is on my local machine (FLOCI).
       - name: Initialize root configuration without backend
@@ -53,7 +52,7 @@ jobs:
 
         # select the workspace env for terraform
       - name : Select Terraform Workspace
-        run : terrfaorm workspace select "${{inputs.environemnt}}"
+        run : terraform workspace select "${{inputs.environment}}"
 
         #create the needed terraform plan
       - name : Create Terraform Plan
