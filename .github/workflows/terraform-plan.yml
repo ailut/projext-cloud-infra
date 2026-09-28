@@ -1,0 +1,60 @@
+#get a basic idea of what each block does.
+# no need to memorise the details of each block.
+
+#name of the workflow in github action
+name: Terraform Plan
+
+#This is to run the action manually from the github actions tab.
+# here we also include input triggers to selec the target env for this workflow 
+
+on:     
+  workflow_dispatch:
+    inputs :
+        environment :
+            description : Env to plan
+            required : true
+            type : choice
+            options :
+                - dev
+                - qa
+
+#setting permissions for the github action.    
+permissions:
+  contents: read
+
+env : 
+    TF_VAR_project : projext
+    AWS_ACCESS_KEY_ID: test
+    AWS_SECRET_ACCESS_KEY: test
+    AWS_DEFAULT_REGION: us-east-1
+
+
+#note : Job-ID : terraform-plan
+#       Github action name : Terraform Plan
+#This job is run on local machine which host FLOCI (mac).
+jobs:
+  terraform-plan:
+    runs-on: [self-hosted, macOS, ARM64]
+
+    steps:
+        # downloads repository onto that Ubuntu runner.
+      - name: Check out repository
+        uses: actions/checkout@v4
+        
+        # makes terraform available on the temporary ubuntu machine.
+      - name: Verify Floci Connectivity
+        run: curl --fail --silent --show-error http://localhost:4566/_floci/health
+        
+        
+        # initialize terraform without backend whihout interative questions. 
+        # Backend here is on my local machine (FLOCI).
+      - name: Initialize root configuration without backend
+        run: terraform init -input=false
+
+        # select the workspace env for terraform
+      - name : Select Terraform Workspace
+        run : terrfaorm workspace select "${{inputs.environemnt}}"
+
+        #create the needed terraform plan
+      - name : Create Terraform Plan
+        run : terraform plan -input=false
