@@ -41,7 +41,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
         
-        # makes terraform available on the temporary ubuntu machine.
+        # # Verify that Floci is reachable from the self-hosted Mac runner.
       - name: Verify Floci Connectivity
         run: curl --fail --silent --show-error http://localhost:4566/_floci/health
           
