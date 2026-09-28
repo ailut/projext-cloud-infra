@@ -45,9 +45,9 @@ jobs:
       - name: Verify Floci Connectivity
         run: curl --fail --silent --show-error http://localhost:4566/_floci/health
           
-        # initialize terraform without backend whihout interative questions. 
+        # initialize terraform without interative questions. 
         # Backend here is on my local machine (FLOCI).
-      - name: Initialize root configuration without backend
+      - name: Initialize Terraform
         run: terraform init -input=false
 
         # select the workspace env for terraform
