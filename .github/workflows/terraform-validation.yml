@@ -1,0 +1,62 @@
+#get a basic idea of what each block does.
+# no need to memorise the details of each block.
+
+#name of the workflow in github action
+name: Terraform Validation
+
+#run action on PR's targeting main branch.
+on:
+  pull_request:
+    branches:
+      - main
+      
+#This is to run the action manually from the github actions tab.      
+  workflow_dispatch:
+
+#setting permissions for the github action.    
+permissions:
+  contents: read
+
+#note : Job-ID : terraform-validation
+#       Github action name : Terraform Validation
+#This job is run on an ubuntu machine provided temporarily by github.
+
+jobs:
+  terraform-validation:
+    runs-on: ubuntu-latest
+
+    steps:
+        # downloads repository onto that Ubuntu runner.
+      - name: Check out repository
+        uses: actions/checkout@v4
+        
+        # makes terraform available on the temporary ubuntu machine.
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.1
+
+        # check terraform formatting, do not change any formatting, 
+        # check files in subdirectories as well.
+      - name: Check Terraform formatting
+        run: terraform fmt -check -recursive
+        
+        # initialize terraform without backend whihout interative questions. 
+        # Backend here is on my local machine (FLOCI).
+      - name: Initialize root configuration without backend
+        run: terraform init -backend=false -input=false
+
+        # terraform checks root/inside .tf file configuration.
+      - name: Validate root configuration
+        run: terraform validate
+
+        # initialise terraform in bootstrap directry, 
+        # again without a backend and without interative questions.
+      - name: Initialize bootstrap configuration
+        working-directory: bootstrap
+        run: terraform init -backend=false -input=false
+
+        # similarly, validate terraform configuration in bootstrap directory.
+      - name: Validate bootstrap configuration
+        working-directory: bootstrap
+        run: terraform validate
