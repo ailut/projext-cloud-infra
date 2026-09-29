@@ -1,0 +1,63 @@
+#get a basic idea of what each block does.
+# no need to memorise the details of each block.
+
+#name of the workflow in github action
+name: Terraform Apply
+
+#This is to run the action manually from the github actions tab.
+# here also included are input triggers to selec the target env for this workflow 
+
+on:     
+  workflow_dispatch:
+    inputs :
+        environment :
+            description : Env to apply
+            required : true
+            type : choice
+            options :
+                - dev
+                - qa
+
+#setting permissions for the github action.    
+permissions:
+  contents: read
+
+env : 
+    TF_VAR_project : projext
+    AWS_ACCESS_KEY_ID: test
+    AWS_SECRET_ACCESS_KEY: test
+    AWS_DEFAULT_REGION: us-east-1
+
+
+#note : Job-ID : terraform-apply
+#       Github action name : Terraform Apply
+#This job is run on local machine which host FLOCI (mac).
+jobs:
+  terraform-apply:
+    runs-on: [self-hosted, macOS, ARM64]
+
+    steps:
+        # downloads repository onto runner.
+      - name: Check out repository
+        uses: actions/checkout@v4
+        
+        # Verify that Floci is reachable from the self-hosted Mac runner.
+      - name: Verify Floci Connectivity
+        run: curl --fail --silent --show-error http://localhost:4566/_floci/health
+          
+        # initialize terraform without interative questions. 
+        # Backend here is on my local machine (FLOCI).
+      - name: Initialize Terraform
+        run: terraform init -input=false
+
+        # select the workspace env for terraform
+      - name : Select Terraform Workspace
+        run : terraform workspace select "${{inputs.environment}}"
+
+        #create terraform plan
+      - name : Create Terraform Plan
+        run : terraform plan -input=false -out=tfplan
+
+        #create the needed infra changes using 'apply'
+      - name : Apply Terraform Plan
+        run : terraform apply -input=false -auto-approve tfplan
