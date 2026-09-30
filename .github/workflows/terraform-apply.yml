@@ -35,6 +35,7 @@ env :
 jobs:
   terraform-apply:
     runs-on: [self-hosted, macOS, ARM64]
+    environment : ${{inputs.environment}}
 
     steps:
         # downloads repository onto runner.
