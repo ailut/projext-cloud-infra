@@ -23,10 +23,10 @@ permissions:
   contents: read
 
 env : 
-    TF_VAR_project : projext
+    TF_VAR_project : ${{vars.TF_VAR_PROJECT}}
     AWS_ACCESS_KEY_ID: test
     AWS_SECRET_ACCESS_KEY: test
-    AWS_DEFAULT_REGION: us-east-1
+    AWS_DEFAULT_REGION: ${{vars.AWS_DEFAULT_REGION}}
 
 
 #note : Job-ID : terraform-apply
